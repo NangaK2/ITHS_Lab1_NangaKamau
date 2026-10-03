@@ -1,4 +1,4 @@
-package Laboration1;
+package LibraryManager;
 
 public class Member {
     private String name;

@@ -1,3 +1,3 @@
-package Laboration1;
+package LibraryManager;
 
 public record Book (String title, String author, String isbn){}
