@@ -24,4 +24,23 @@ public class Library {
         books[numberOfBooks] = book;
         numberOfBooks++;
     }
+
+
+    public void registerMember() {
+    }
+
+    public void borrowBook() {
+    }
+
+    public void returnBook() {
+    }
+
+    public void searchBook() {
+    }
+
+    public void showAllBooks() {
+    }
+
+    public void showMembersWithMostLoans() {
+    }
 }
