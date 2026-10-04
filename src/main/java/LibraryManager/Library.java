@@ -12,21 +12,72 @@ public class Library {
         if (numberOfBooks >= books.length) {
             Book[] newBooks = new Book[books.length * 2];
             //Copy the existing books to the new array.
-            System.arraycopy(books, 0, newBooks, 0, books.length);
-            books = newBooks;
+            System.arraycopy(books, 0, newBooks, 0, books.length);      //Instead of System.arraycopy, a for loop can be used to copy the books.
+            books = newBooks;                                                          //Points to the new bigger array (double size) and copies of the existing books.
         }
 
-        String title = IO.readln("Enter the title of the book: ");
-        String author = IO.readln("Enter the author of the book: ");
-        String isbn = IO.readln("Enter the ISBN of the book: ");
+        //Handle invalid input, ** update, unnecessary since changing isbn from int to string.
+        try {
+            String title = IO.readln("Enter the title of the book: ");
+            String author = IO.readln("Enter the author of the book: ");
+            String isbn = IO.readln("Enter the ISBN of the book: ");        //**
 
-        Book book = new Book(title, author, isbn);
-        books[numberOfBooks] = book;
-        numberOfBooks++;
+            Book book = new Book(title, author, isbn);
+            books[numberOfBooks] = book;
+            numberOfBooks++;
+
+        }
+        catch (NumberFormatException e) {
+            IO.println("Invalid ISBN format. Please enter a valid ISBN using numbers");
+        }
     }
 
-
     public void registerMember() {
+        //To manage the case where the Members list is full.
+        if (numberOfMembers >= members.length) {
+            Member[] newMembers = new Member[members.length * 2];
+            //Copy the existing members to the new array.
+            System.arraycopy(members, 0, newMembers, 0, members.length);
+            members = newMembers;
+        }
+
+        //Handles invalid id number input. Absolutely needed here since id is a 4-digit int where isbn in addBook() is not.
+        //While loop to not start over from the starting menu when invalid input is given.
+        boolean isValid = false;
+        while (!isValid) {
+            try {
+                String name = IO.readln("Enter the name of the member: ");
+                int id = Integer.parseInt(IO.readln("Enter the members intended id number using 4-digits: "));
+                if (id < 1000 || id > 9999) {
+                    IO.println("Id number is not 4-digits. Please enter a valid 4-digit integer.");
+                    continue;
+                }
+
+                //Handles the case where a member with the same id already exists.
+                if( takenID(members, id) ) {
+                    IO.println("Member with the same id already exists. Enter a different valid id number.");
+                    continue;
+                }
+
+                //If no member with the same id exists and id is valid, creates a new member and adds it to the array members.
+                Member member = new Member(name, id);
+                members[numberOfMembers] = member;
+                numberOfMembers++;
+                isValid = true;
+                IO.println("Member registered successfully!");
+
+            } catch (NumberFormatException e) {
+                IO.println("Invalid id number. Please enter a valid 4-digit integer.");
+            }
+        }
+    }
+
+    public boolean takenID(Member[] members, int id) {
+        for (Member member : members) {
+            if (member != null && member.getId() == id)
+                return true;
+        }
+        return false;
     }
 
     public void borrowBook() {
