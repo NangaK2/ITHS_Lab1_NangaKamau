@@ -6,7 +6,7 @@ public class Library {
     private int numberOfBooks = 0;
     private Member[] members = new Member[10];
     private int numberOfMembers = 0;
-    //private Loan[] loanedBooks = new Loan[10];
+    private Loan[] loanedBooks = new Loan[10];
     private int numberOfLoans = 0;
 
     public void addBook() {
@@ -50,7 +50,6 @@ public class Library {
                 IO.println("Invalid ISBN format. Please enter a valid ISBN using numbers");
             }
     }
-
 
     public void registerMember() {
         //To manage the case where the Members list is full.
@@ -146,7 +145,6 @@ public class Library {
             return;
         }
 
-
         String targetSearch = IO.readln("Enter the title or author of the book you want to borrow: ");
         Book[] bookMatches = findBook(targetSearch);
         int matchCounter = 0;               //Variable to count how many matching books are found in bookMatches.
@@ -156,7 +154,7 @@ public class Library {
             }
         }
         if (matchCounter == 0) {
-            IO.println("No books found with the title or author: '" + targetSearch + "'. Returning to main menu.");
+            IO.println("No books found with the title or author: " + targetSearch + ". Returning to main menu.");
             return;
         }
 
@@ -164,7 +162,7 @@ public class Library {
         if (matchCounter == 1)       //Only one matching book found, it is found at index 0.
             targetBook = bookMatches[0];
         else {
-            IO.println("Multiple books found with the title or author '" + targetSearch + "'. Please specify which book you want to borrow.");
+            IO.println("Multiple books found with the title or author " + targetSearch + ". Please specify which book you want to borrow.");
             for (int i = 0; i < matchCounter; i++) {
                 IO.println((i + 1) + ". " + bookMatches[i].title() + " - " + bookMatches[i].author());
             }
@@ -185,25 +183,42 @@ public class Library {
             }
         }
 
-        //Need a check if the book is already loaned. Need to implement a new record for this
+        //Need a check if the book is already loaned. Need to implement a new record Loan with the book and member.
+        //Then add the loan to the loanedBooks array.
         for (int i = 0; i < numberOfLoans; i++) {
-            //if (loanedBooks[i].book().equals(targetBook)) {
-                System.out.println("Boken är redan utlånad.");
+            if (loanedBooks[i].book().equals(targetBook)) {
+                IO.println("Book is already loaned.");
                 return;
             }
         }
 
+        //To manage the case when the array loanedBooks is full. Double the size of the array.
+        if (numberOfLoans >= loanedBooks.length) {
+            Loan[] newLoans = new Loan[loanedBooks.length * 2];
+            //Copy the existing loans to the new array.
+            System.arraycopy(loanedBooks, 0, newLoans, 0, loanedBooks.length);
+            loanedBooks = newLoans;
+        }
+
+        Loan newLoan = new Loan(targetMember, targetBook);
+        loanedBooks[numberOfLoans++] = newLoan;
+
+        targetMember.increaseActiveLoan();
+        IO.println("Book loaned successfully. Member: " + targetMember.getName() + " has now loaned " + targetBook.title() + ".");
+        IO.println("Active loans for member: " + targetMember.getActiveLoans());
+    }
+
 
     public Book[] findBook(String targetSearch) {
-        Book[] matches = new Book[numberOfBooks];
+        Book[] bookMatches = new Book[numberOfBooks];
         int numberOfMatches = 0;
 
-        for (Book book : books) {
-            if (book.title().toLowerCase().contains(targetSearch) || book.author().toLowerCase().contains(targetSearch)) {
-                matches[numberOfMatches++] = book;
+        for (int i = 0; i < numberOfBooks; i++) {
+            if (books[i].author().toLowerCase().contains(targetSearch.toLowerCase()) || books[i].title().toLowerCase().contains(targetSearch.toLowerCase())) {
+                bookMatches[numberOfMatches++] = books[i];
             }
         }
-        return matches;
+        return bookMatches;
     }
 
     public void returnBook() {
