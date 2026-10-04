@@ -208,7 +208,6 @@ public class Library {
         IO.println("Active loans for member: " + targetMember.getActiveLoans());
     }
 
-
     public Book[] findBook(String targetSearch) {
         Book[] bookMatches = new Book[numberOfBooks];
         int numberOfMatches = 0;
@@ -334,7 +333,6 @@ public class Library {
         }
     }
 
-
     public void showAllBooks() {
         //Edge case
         if (numberOfBooks == 0) {
@@ -375,7 +373,27 @@ public class Library {
         }
     }
 
-
     public void showMembersWithMostLoans() {
+        //Verify if any members exist in the system
+        if (numberOfMembers == 0) {
+            IO.println("There are currently no members in the library.");
+            return;
+        }
+
+        //Track maxLoans by setting default to first member in members
+        Member maxLoans = members[0];
+        for (int i = 1; i < numberOfMembers; i++) {
+            if (members[i].getActiveLoans() > maxLoans.getActiveLoans()) {
+                maxLoans = members[i];
+            }
+        }
+        IO.println("--- Member(s) with the most active loans are ---");
+        for (int i = 0; i < numberOfMembers; i++) {
+            if (members[i].getActiveLoans() == maxLoans.getActiveLoans()) {
+                IO.println(members[i].getName() + " - " + members[i].getActiveLoans() + " active loans.");
+            }
+        }
     }
 }
+
+
