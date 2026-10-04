@@ -222,6 +222,128 @@ public class Library {
     }
 
     public void returnBook() {
+        //Unsure if functionality should include that only the member with the loaned book can return that book. Or if it is general?
+        //Assumption is it is general.
+//        int id = 0;
+//        String name = "";
+//        try {
+//            name = IO.readln("Name of member who wants to return a book: ");
+//            if (name.isEmpty()) {
+//                IO.println("No name entered. Please enter a valid name. Returning to main menu.");
+//                return;
+//            }
+//
+//            id = Integer.parseInt(IO.readln("Enter the id number of the member who wants to return a book: "));
+//            if (id < 1000 || id > 9999) {
+//                IO.println("Invalid id number. Please enter a valid 4-digit integer. Returning to main menu.");
+//                return;
+//            }
+//
+//        } catch (NumberFormatException e) {
+//            IO.println("Invalid id number. Please enter a valid 4-digit integer. Returning to main menu.");
+//        }
+//
+//        //Find the member by ID in the members array if valid id number has been entered.
+//        Member targetMember = null;
+//        for (Member member : members) {
+//            if (member != null && member.getId() == id) {
+//                targetMember = member;
+//                break;
+//            }
+//        }
+//        //Continue
+
+        String targetSearch = IO.readln("Which book do you want to return. Enter title or part of title: ");
+        Loan[] loanMatches = new Loan[numberOfLoans];
+        int matchCounter = 0;
+        Loan targetLoan = null;
+
+        //Loop through the loanedBooks array to find matching loans based on the target search title.
+        for (int i = 0; i < numberOfLoans; i++) {
+            if (loanedBooks[i].book().title().toLowerCase().contains(targetSearch.toLowerCase())) {
+                loanMatches[matchCounter++] = loanedBooks[i];
+            }
+        }
+        if (matchCounter == 0) {
+            IO.println("No matching loans found. Returning to main menu");
+            return;
+        }
+
+        if (matchCounter == 1) {
+            IO.println("Found 1 matching loan:");
+            IO.println(loanMatches[0].book().title() + " - " + loanMatches[0].book().author() + "- Loaned by " + loanMatches[0].member().getName());
+            targetLoan = loanMatches[0];
+        } else if (matchCounter > 1) {
+            IO.println("Found " + matchCounter + " matching loans:");
+            for (int i = 0; i < matchCounter; i++) {
+                //IO.println(loanMatches[i].book().title());
+                IO.println((i + 1) + ". " + loanMatches[i].book().title() + " - " + loanMatches[i].book().author() +
+                        "- Loaned by " + loanMatches[i].member().getName());
+            }
+
+            //To handle multiple matches
+            while (true) {
+                try {
+                    int choice = Integer.parseInt(IO.readln("Enter the number of the book you want to return: "));
+                    if (choice >= 1 && choice <= matchCounter) {
+                        targetLoan = loanMatches[choice - 1];       //Since the user input is 1-based, we need to subtract 1 to get the correct index.
+                        break;
+                    } else {
+                        IO.println("Invalid choice. Please try again, enter a number between 1 and " + matchCounter + ": ");
+                    }
+                } catch (NumberFormatException e) {
+                    IO.println("Invalid input. Please enter a valid number.");
+                }
+            }
+        }
+
+        IO.println("Want to return loan: " + targetLoan.book().title() + " - " + targetLoan.book().author() + " - Loaned by " + targetLoan.member().getName());
+        //Confirm return of book
+        while (true) {
+            String input = IO.readln("Confirm return? (Yes/No): ");
+            if (input.equalsIgnoreCase("yes")) {
+                break;
+            } else if (input.equalsIgnoreCase("no")) {
+                IO.println("Book return aborted. Returning to main menu.");
+                return;
+            } else {
+                IO.println("Invalid input. Please enter 'Yes' or 'No'.");
+            }
+        }
+
+        //Remove targetLoan from loanedBooks list
+        int targetLoanIndex = -1;
+        for (int i = 0; i < numberOfLoans; i++) {
+            if (loanedBooks[i].equals(targetLoan)) {
+                targetLoanIndex = i;                      //Find index of targetLoan in loanedBooks list
+                break;
+            }
+        }
+
+        if (targetLoanIndex == -1) {
+            IO.println("ERROR, targetLoan not found in loanedBooks list");
+            return;
+        }
+        for(int i = targetLoanIndex; i < numberOfLoans - 1; i++) {
+            loanedBooks[i] = loanedBooks[i + 1];                //Move all loans after targetLoan one index down
+        }
+        loanedBooks[numberOfLoans - 1] = null;                  //Set last loan in list to null
+        numberOfLoans--;                                        //Decrease number of loans
+        targetLoan.member().decreaseActiveLoan();               //Decrease active loan count for member who borrowed targetLoan
+        IO.println(targetLoan.book().title()  + " has been returned.");
+
+        //Print active loan count for member who returned book
+        IO.println("Active loan count for " + targetLoan.member().getName() + " is now " + targetLoan.member().getActiveLoans());
+
+        //Show remaining active loans for member who returned book
+        if (targetLoan.member().getActiveLoans() > 0) {
+            IO.println("Borrowed books by member: " + targetLoan.member().getName());
+            for (int i = 0; i < numberOfLoans; i++) {
+                if (loanedBooks[i].member().equals(targetLoan.member())) {
+                    IO.println("- " + loanedBooks[i].book().title());
+                }
+            }
+        }
     }
 
     public void searchBook() {
