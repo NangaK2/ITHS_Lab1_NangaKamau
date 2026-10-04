@@ -25,7 +25,6 @@ public class Library {
             Book book = new Book(title, author, isbn);
             books[numberOfBooks] = book;
             numberOfBooks++;
-
         }
         catch (NumberFormatException e) {
             IO.println("Invalid ISBN format. Please enter a valid ISBN using numbers");
@@ -41,12 +40,16 @@ public class Library {
             members = newMembers;
         }
 
-        //Handles invalid id number input. Absolutely needed here since id is a 4-digit int where isbn in addBook() is not.
-        //While loop to not start over from the starting menu when invalid input is given.
-        boolean isValid = false;
-        while (!isValid) {
-            try {
+        //Handles invalid name and id number input. Absolutely needed here since id is a 4-digit int where isbn in addBook() is not.
+        try {
+            //While loop to not start over from the starting menu when invalid/occupied member id input is given or empty name input.
+            while (true) {
                 String name = IO.readln("Enter the name of the member: ");
+                if (name.isEmpty()) {
+                    IO.println("No name entered. Please enter a valid name.");
+                    continue;
+                }
+
                 int id = Integer.parseInt(IO.readln("Enter the members intended id number using 4-digits: "));
                 if (id < 1000 || id > 9999) {
                     IO.println("Id number is not 4-digits. Please enter a valid 4-digit integer.");
@@ -54,7 +57,7 @@ public class Library {
                 }
 
                 //Handles the case where a member with the same id already exists.
-                if( takenID(members, id) ) {
+                if (takenID(members, id)) {
                     IO.println("Member with the same id already exists. Enter a different valid id number.");
                     continue;
                 }
@@ -63,13 +66,13 @@ public class Library {
                 Member member = new Member(name, id);
                 members[numberOfMembers] = member;
                 numberOfMembers++;
-                isValid = true;
                 IO.println("Member registered successfully!");
+                break;
+            }
 
-            } catch (NumberFormatException e) {
+        } catch(NumberFormatException e){
                 IO.println("Invalid id number. Please enter a valid 4-digit integer.");
             }
-        }
     }
 
     public boolean takenID(Member[] members, int id) {
