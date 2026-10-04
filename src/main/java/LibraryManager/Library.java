@@ -16,20 +16,39 @@ public class Library {
             books = newBooks;                                                          //Points to the new bigger array (double size) and copies of the existing books.
         }
 
-        //Handle invalid input, ** update, unnecessary since changing isbn from int to string.
+        //Handle invalid input, empty title, empty author, empty isbn
         try {
-            String title = IO.readln("Enter the title of the book: ");
-            String author = IO.readln("Enter the author of the book: ");
-            String isbn = IO.readln("Enter the ISBN of the book: ");        //**
+            //While loop to avoid starting from the menu if empty inputs are entered
+            while (true) {
+                String title = IO.readln("Enter the title of the book: ");
+                if(title.isEmpty()){
+                    IO.println("Title cannot be empty. Please enter a valid title.");
+                    continue;
+                }
 
-            Book book = new Book(title, author, isbn);
-            books[numberOfBooks] = book;
-            numberOfBooks++;
-        }
-        catch (NumberFormatException e) {
-            IO.println("Invalid ISBN format. Please enter a valid ISBN using numbers");
-        }
+                String author = IO.readln("Enter the author of the book: ");
+                if(author.isEmpty()){
+                    IO.println("Author cannot be empty. Please enter a valid author.");
+                    continue;
+                }
+
+                String isbn = IO.readln("Enter the isbn of the book: ");
+                if(isbn.isEmpty()){
+                    IO.println("Isbn cannot be empty. Please enter a valid isbn.");
+                    continue;
+                }
+
+                Book book = new Book(title, author, isbn);
+                books[numberOfBooks] = book;
+                numberOfBooks++;
+                IO.println("The book " + title + " has been added successfully!");
+                break;
+            }
+        } catch(NumberFormatException e){   //Is not actually needed here since isbn was changed to type string
+                IO.println("Invalid ISBN format. Please enter a valid ISBN using numbers");
+            }
     }
+
 
     public void registerMember() {
         //To manage the case where the Members list is full.
