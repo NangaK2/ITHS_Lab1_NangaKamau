@@ -6,6 +6,8 @@ public class Library {
     private int numberOfBooks = 0;
     private Member[] members = new Member[10];
     private int numberOfMembers = 0;
+    //private Loan[] loanedBooks = new Loan[10];
+    private int numberOfLoans = 0;
 
     public void addBook() {
         //To manage the case where the library is full.
@@ -76,7 +78,7 @@ public class Library {
                 }
 
                 //Handles the case where a member with the same id already exists.
-                if (takenID(members, id)) {
+                if (takenID(id)) {
                     IO.println("Member with the same id already exists. Enter a different valid id number.");
                     continue;
                 }
@@ -94,7 +96,8 @@ public class Library {
             }
     }
 
-    public boolean takenID(Member[] members, int id) {
+    //Method for checking if a member with the same id already exists.
+    public boolean takenID(int id) {
         for (Member member : members) {
             if (member != null && member.getId() == id)
                 return true;
@@ -103,6 +106,104 @@ public class Library {
     }
 
     public void borrowBook() {
+        //Since the member ID is unique, we can use it to find the member instead of name.
+        int id = 0;
+        String name = "";
+        try {
+            name = IO.readln("Name of member who wants to borrow a book: ");
+            if (name.isEmpty()) {
+                IO.println("No name entered. Please enter a valid name. Returning to main menu.");
+                return;
+            }
+
+            id = Integer.parseInt(IO.readln("Enter the id number of the member who wants to borrow a book: "));
+            if (id < 1000 || id > 9999) {
+                IO.println("Invalid id number. Please enter a valid 4-digit integer. Returning to main menu.");
+                return;
+            }
+
+        } catch (NumberFormatException e) {
+            IO.println("Invalid id number. Please enter a valid 4-digit integer. Returning to main menu.");
+        }
+
+        //Find the member by ID in the members array if valid id number has been entered.
+        Member targetMember = null;
+        for (Member member : members) {
+            if (member != null && member.getId() == id) {
+                targetMember = member;
+                break;
+            }
+        }
+
+        if (targetMember == null) {
+            IO.println("Member: " + name + " with ID: " + id + " is not registered. Returning to main menu.");
+            return;
+        }
+
+        //Check if the member can add books to their active loans array
+        if (targetMember.maxActiveLoans()) {
+            IO.println("Member: " + targetMember.getName() + " has reached their maximum borrowing limit (3 books). Returning to main menu.");
+            return;
+        }
+
+
+        String targetSearch = IO.readln("Enter the title or author of the book you want to borrow: ");
+        Book[] bookMatches = findBook(targetSearch);
+        int matchCounter = 0;               //Variable to count how many matching books are found in bookMatches.
+        for (Book bookMatch : bookMatches) {
+            if (bookMatch != null) {
+                matchCounter++;
+            }
+        }
+        if (matchCounter == 0) {
+            IO.println("No books found with the title or author: '" + targetSearch + "'. Returning to main menu.");
+            return;
+        }
+
+        Book targetBook;
+        if (matchCounter == 1)       //Only one matching book found, it is found at index 0.
+            targetBook = bookMatches[0];
+        else {
+            IO.println("Multiple books found with the title or author '" + targetSearch + "'. Please specify which book you want to borrow.");
+            for (int i = 0; i < matchCounter; i++) {
+                IO.println((i + 1) + ". " + bookMatches[i].title() + " - " + bookMatches[i].author());
+            }
+
+            //To handle multiple matches
+            while (true) {
+                try {
+                    int choice = Integer.parseInt(IO.readln("Enter the number of the book you want to borrow: "));
+                    if (choice >= 1 && choice <= matchCounter) {
+                        targetBook = bookMatches[choice - 1];       //Since the user input is 1-based, we need to subtract 1 to get the correct index.
+                        break;
+                    } else {
+                        IO.println("Invalid choice. Please try again, enter a number between 1 and " + matchCounter + ": ");
+                    }
+                } catch (NumberFormatException e) {
+                    IO.println("Invalid input. Please enter a valid number.");
+                }
+            }
+        }
+
+        //Need a check if the book is already loaned. Need to implement a new record for this
+        for (int i = 0; i < numberOfLoans; i++) {
+            //if (loanedBooks[i].book().equals(targetBook)) {
+                System.out.println("Boken är redan utlånad.");
+                return;
+            }
+        }
+
+
+    public Book[] findBook(String targetSearch) {
+        Book[] matches = new Book[numberOfBooks];
+        int numberOfMatches = 0;
+
+        for (Book book : books) {
+            if (book.title().toLowerCase().contains(targetSearch) || book.author().toLowerCase().contains(targetSearch)) {
+                matches[numberOfMatches++] = book;
+            }
+        }
+        return matches;
     }
 
     public void returnBook() {
