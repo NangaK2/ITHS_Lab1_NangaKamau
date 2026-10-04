@@ -23,19 +23,19 @@ public class Library {
             //While loop to avoid starting from the menu if empty inputs are entered
             while (true) {
                 String title = IO.readln("Enter the title of the book: ");
-                if(title.isEmpty()){
+                if (title.isEmpty()) {
                     IO.println("Title cannot be empty. Please enter a valid title.");
                     continue;
                 }
 
                 String author = IO.readln("Enter the author of the book: ");
-                if(author.isEmpty()){
+                if (author.isEmpty()) {
                     IO.println("Author cannot be empty. Please enter a valid author.");
                     continue;
                 }
 
                 String isbn = IO.readln("Enter the isbn of the book: ");
-                if(isbn.isEmpty()){
+                if (isbn.isEmpty()) {
                     IO.println("Isbn cannot be empty. Please enter a valid isbn.");
                     continue;
                 }
@@ -46,9 +46,9 @@ public class Library {
                 IO.println("The book " + title + " has been added successfully!");
                 break;
             }
-        } catch(NumberFormatException e){   //Is not actually needed here since isbn was changed to type string
-                IO.println("Invalid ISBN format. Please enter a valid ISBN using numbers");
-            }
+        } catch (NumberFormatException e) {   //Is not actually needed here since isbn was changed to type string
+            IO.println("Invalid ISBN format. Please enter a valid ISBN using numbers");
+        }
     }
 
     public void registerMember() {
@@ -90,9 +90,9 @@ public class Library {
                 break;
             }
 
-        } catch(NumberFormatException e){
-                IO.println("Invalid id number. Please enter a valid 4-digit integer.");
-            }
+        } catch (NumberFormatException e) {
+            IO.println("Invalid id number. Please enter a valid 4-digit integer.");
+        }
     }
 
     //Method for checking if a member with the same id already exists.
@@ -302,7 +302,7 @@ public class Library {
         loanedBooks[numberOfLoans - 1] = null;                  //Set last loan in list to null
         numberOfLoans--;                                        //Decrease number of loans
         targetLoan.member().decreaseActiveLoan();               //Decrease active loan count for member who borrowed targetLoan
-        IO.println(targetLoan.book().title()  + " has been returned.");
+        IO.println(targetLoan.book().title() + " has been returned.");
 
         //Print active loan count for member who returned book
         IO.println("Active loan count for " + targetLoan.member().getName() + " is now " + targetLoan.member().getActiveLoans());
@@ -336,7 +336,45 @@ public class Library {
 
 
     public void showAllBooks() {
+        //Edge case
+        if (numberOfBooks == 0) {
+            IO.println("No books in library.");
+            return;
+        }
+
+        //Bubble Sort algorithm
+        for (int i = 0; i < numberOfBooks - 1; i++) {
+            for (int j = 0; j < numberOfBooks - i - 1; j++) {
+
+                //Compare titles ignoring case sensitivity
+                String currentTitle = books[j].title();
+                String nextTitle = books[j + 1].title();
+                if (currentTitle.compareToIgnoreCase(nextTitle) > 0) {
+                    Book temp = books[j];
+                    books[j] = books[j + 1];
+                    books[j + 1] = temp;
+                }
+            }
+        }
+        IO.println("-- All books in library (sorted alphabetically by title)--");
+        for (int i = 0; i < numberOfBooks; i++) {
+            Book book = books[i];
+            boolean isBorrowed = false;
+
+            //Check if book is loaned
+            for (int j = 0; j < numberOfLoans; j++) {
+                if (loanedBooks[j].book().equals(book)) {
+                    IO.println(book + " - Is loaned to: " + loanedBooks[j].member().getName());
+                    isBorrowed = true;
+                    break;
+                }
+            }
+            if (!isBorrowed) {
+                IO.println(book + " - is Available");
+            }
+        }
     }
+
 
     public void showMembersWithMostLoans() {
     }
