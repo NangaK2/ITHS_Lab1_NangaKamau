@@ -224,34 +224,6 @@ public class Library {
     public void returnBook() {
         //Unsure if functionality should include that only the member with the loaned book can return that book. Or if it is general?
         //Assumption is it is general.
-//        int id = 0;
-//        String name = "";
-//        try {
-//            name = IO.readln("Name of member who wants to return a book: ");
-//            if (name.isEmpty()) {
-//                IO.println("No name entered. Please enter a valid name. Returning to main menu.");
-//                return;
-//            }
-//
-//            id = Integer.parseInt(IO.readln("Enter the id number of the member who wants to return a book: "));
-//            if (id < 1000 || id > 9999) {
-//                IO.println("Invalid id number. Please enter a valid 4-digit integer. Returning to main menu.");
-//                return;
-//            }
-//
-//        } catch (NumberFormatException e) {
-//            IO.println("Invalid id number. Please enter a valid 4-digit integer. Returning to main menu.");
-//        }
-//
-//        //Find the member by ID in the members array if valid id number has been entered.
-//        Member targetMember = null;
-//        for (Member member : members) {
-//            if (member != null && member.getId() == id) {
-//                targetMember = member;
-//                break;
-//            }
-//        }
-//        //Continue
 
         String targetSearch = IO.readln("Which book do you want to return. Enter title or part of title: ");
         Loan[] loanMatches = new Loan[numberOfLoans];
@@ -340,14 +312,28 @@ public class Library {
             IO.println("Borrowed books by member: " + targetLoan.member().getName());
             for (int i = 0; i < numberOfLoans; i++) {
                 if (loanedBooks[i].member().equals(targetLoan.member())) {
-                    IO.println("- " + loanedBooks[i].book().title());
+                    IO.println("- " + loanedBooks[i].book().title() + " - " + loanedBooks[i].book().author());
                 }
             }
         }
     }
 
     public void searchBook() {
+        String search = IO.readln("What book do you want to search for? Enter the whole or part of the title/author:");
+        Book[] bookMatches = findBook(search);      //Use findBook method, implemented earlier.
+        boolean notFound = true;
+
+        for (Book bookMatch : bookMatches) {
+            if (bookMatch != null) {
+                IO.println(bookMatch);      //Prints the book instance. Instead of the title, author, and ISBN separately.
+                notFound = false;
+            }
+        }
+        if (notFound) {
+            IO.println("No matches found.");
+        }
     }
+
 
     public void showAllBooks() {
     }
